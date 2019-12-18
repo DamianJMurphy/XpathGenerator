@@ -37,13 +37,13 @@ import org.w3c.dom.NodeList;
 public class XpathGenerator {
 
     private static final String[] DEFAULT_PREFIXES = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "l", "m", "n", "o", "p", "q",
-                                                "r", "s", "t", "u", "v", "w", "x", "y", "z"};
-    
+        "r", "s", "t", "u", "v", "w", "x", "y", "z"};
+
     private static final ArrayList<String> prefixes = new ArrayList<>();
     private static int prefix = -1;
     private static final HashMap<String, String> bindings = new HashMap<>();
     private static final HashSet<String> xpaths = new HashSet<>();
-    
+
     /**
      * @param args the command line arguments
      */
@@ -52,13 +52,13 @@ public class XpathGenerator {
             case 1:
                 loadContext(null);
                 break;
-                
+
             case 2:
                 loadContext(args[1]);
                 break;
-                
+
             default:
-                System.err.println("Usage: ");
+                System.err.println("Usage: java -jar XPathGenerator inputfile contextfile");
                 System.exit(1);
                 break;
         }
@@ -80,12 +80,11 @@ public class XpathGenerator {
                 sb.append("\"");
                 System.out.println(sb.toString());
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
     public static void loadContext(String f) {
         if (f == null) {
             prefixes.addAll(Arrays.asList(DEFAULT_PREFIXES));
@@ -93,11 +92,13 @@ public class XpathGenerator {
         }
         try {
             BufferedReader br = new BufferedReader(new FileReader(f));
+            @SuppressWarnings("UnusedAssignment")
             String l = null;
             while ((l = br.readLine()) != null) {
                 if (!l.startsWith("xmlns")) {
                     throw new Exception(f + " is not a namespace context list: " + l);
                 }
+                @SuppressWarnings("UnusedAssignment")
                 String pfx = null;
                 String[] parts = l.split("=");
                 if (!parts[0].contains(":")) {
@@ -110,19 +111,18 @@ public class XpathGenerator {
                 prefixes.add(pfx);
                 bindings.put(uri, pfx);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             System.exit(2);
         }
     }
-    
+
     public static void getXpaths(String path, Node n) {
         String p = null;
         String s = n.getNamespaceURI();
         if (s != null) {
             if (bindings.containsKey(s)) {
-               p = bindings.get(s);
+                p = bindings.get(s);
             } else {
                 p = prefixes.get(++prefix);
                 bindings.put(s, p);
@@ -149,30 +149,31 @@ public class XpathGenerator {
         NodeList nl = n.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node node = nl.item(i);
-            switch (node.getNodeType()) {                    
+            switch (node.getNodeType()) {
                 case Node.ELEMENT_NODE:
                     getXpaths(cp, node);
                     break;
-                    
+
                 default:
                     break;
             }
         }
     }
 
-    public static void attributeXpath(String path, Attr a) {        
+    public static void attributeXpath(String path, Attr a) {
         String p = null;
-        if (a.getName().contentEquals("xmlns"))
+        if (a.getName().contentEquals("xmlns")) {
             return;
+        }
         String s = a.getNamespaceURI();
         if (s != null) {
             if (bindings.containsKey(s)) {
-               p = bindings.get(s);
+                p = bindings.get(s);
             } else {
                 p = prefixes.get(++prefix);
                 bindings.put(s, p);
             }
-        }        
+        }
         StringBuilder sb = new StringBuilder(path);
         sb.append("@");
         if (p != null) {
@@ -182,5 +183,5 @@ public class XpathGenerator {
         sb.append(a.getNodeName());
         System.out.println(sb.toString());
     }
-    
+
 }
