@@ -46,18 +46,37 @@ public class XpathGenerator {
     private static int prefix = -1;
     private static final HashMap<String, String> bindings = new HashMap<>();
     private static final HashSet<String> xpaths = new HashSet<>();
+    
+    private static boolean includeIndexes = false;
+    private static boolean printvalue = false;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        switch (args.length) {
+        
+        int argcount = 0;
+        int options = 0;
+        
+        while (args[argcount].startsWith("-")) {
+            if (args[argcount].contentEquals("-i")) {
+                includeIndexes = true;
+                options++;
+            }
+            if (args[argcount].contentEquals("-p")) {
+                printvalue = true;
+                options++;
+            }
+            argcount++;
+        }
+        
+        switch (args.length - options) {
             case 1:
                 loadContext(null);
                 break;
 
             case 2:
-                loadContext(args[1]);
+                loadContext(args[1 + options]);
                 break;
 
             default:
@@ -71,8 +90,8 @@ public class XpathGenerator {
             dbf.setNamespaceAware(true);
             dbf.setIgnoringComments(true);
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document d = db.parse(new File(args[0]));
-            getXpaths("/", d.getDocumentElement());
+            Document d = db.parse(new File(args[options]));
+            getXpaths("/", d.getDocumentElement(), 1);
             System.out.println("\nNamespaces:");
             for (String n : bindings.keySet()) {
                 String p = bindings.get(n);
@@ -120,7 +139,7 @@ public class XpathGenerator {
         }
     }
 
-    public static void getXpaths(String path, Node n) {
+    public static void getXpaths(String path, Node n, int nodeindex) {
         String p = null;
         String s = n.getNamespaceURI();
         if (s != null) {
@@ -137,6 +156,11 @@ public class XpathGenerator {
             sb.append(":");
         }
         sb.append(n.getLocalName());
+        if (includeIndexes) {
+            sb.append("[");
+            sb.append(nodeindex);
+            sb.append("]");            
+        }
         String r = sb.toString();
         sb.append("/");
         String cp = sb.toString();
@@ -149,12 +173,30 @@ public class XpathGenerator {
             Attr at = (Attr) attrs.item(a);
             attributeXpath(cp, at);
         }
+        HashMap<String,Integer> nodeindexes = null;
+        if (includeIndexes) {
+           nodeindexes = new HashMap<>(); 
+        }
         NodeList nl = n.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node node = nl.item(i);
             switch (node.getNodeType()) {
                 case Node.ELEMENT_NODE:
-                    getXpaths(cp, node);
+                    if (includeIndexes) {
+                        String nn = node.getLocalName();
+                        if (nodeindexes.containsKey(nn)) {
+                            int ni = nodeindexes.get(nn);
+                            ni++;
+                            nodeindexes.put(nn, ni);
+                            getXpaths(cp, node, ni);
+                        } else {
+                            nodeindexes.put(nn, 1);
+                            getXpaths(cp, node, 1);
+                        }                        
+                    } else {
+                        getXpaths(cp, node, -1);
+                    }
+                    
                     break;
 
                 default:
@@ -184,6 +226,10 @@ public class XpathGenerator {
             sb.append(":");
         }
         sb.append(a.getNodeName());
+        if (printvalue) {
+            sb.append("\tValue = ");
+            sb.append(a.getValue());
+        }
         System.out.println(sb.toString());
     }
 
