@@ -107,7 +107,7 @@ public class XpathGenerator {
         }
     }
 
-    public static void loadContext(String f) {
+    private static void loadContext(String f) {
         if (f == null) {
             prefixes.addAll(Arrays.asList(DEFAULT_PREFIXES));
             return;
@@ -139,7 +139,7 @@ public class XpathGenerator {
         }
     }
 
-    public static void getXpaths(String path, Node n, int nodeindex) {
+    private static void getXpaths(String path, Node n, int nodeindex) {
         String p = null;
         String s = n.getNamespaceURI();
         if (s != null) {
@@ -205,7 +205,7 @@ public class XpathGenerator {
         }
     }
 
-    public static void attributeXpath(String path, Attr a) {
+    private static void attributeXpath(String path, Attr a) {
         String p = null;
         if (a.getName().contentEquals("xmlns")) {
             return;
