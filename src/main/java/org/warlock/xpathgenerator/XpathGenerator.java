@@ -34,6 +34,15 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
+ * 
+ * usage java -jar XpathGenerator.jar [-p] [-i] &lt;inputfile&gt; [&lt;contextfile&gt;]
+ * 
+ * @param -i optional print the xpath predicate index number 1..n
+ * @param -p optional print the value at the xpath
+ * @param inputfile well formed xml input file
+ * @param contextfile optional text file containing xml namespace declarations eg xmlns:fhir="http://hl7.org/fhir"
+ * 
+ * Outputs to stdout a list of distinct xpaths. May include the predicate index number (-i) and/or the actual value of the element (-p)
  *
  * @author damian
  */
@@ -80,7 +89,7 @@ public class XpathGenerator {
                 break;
 
             default:
-                System.err.println("Usage: java -jar XPathGenerator inputfile contextfile");
+                System.err.println("Usage: java -jar XpathGenerator.jar [-i] [-p] <inputfile> [<contextfile>]");
                 System.exit(1);
                 break;
         }
