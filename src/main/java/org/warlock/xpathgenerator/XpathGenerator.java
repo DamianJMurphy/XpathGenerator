@@ -67,7 +67,7 @@ public class XpathGenerator {
         int argcount = 0;
         int options = 0;
         
-        while (args[argcount].startsWith("-")) {
+        while (args.length > 0 && args[argcount].startsWith("-")) {
             if (args[argcount].contentEquals("-i")) {
                 includeIndexes = true;
                 options++;
