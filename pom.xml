@@ -15,11 +15,6 @@
                 <configuration>
                     <source>11</source>
                     <target>11</target>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.warlock.xpathgenerator.XpathGenerator</mainClass>                                
-                        </manifest>
-                    </archive>
                     <fork>true</fork>
                     <encoding>UTF-8</encoding>
                 </configuration>
@@ -47,31 +42,16 @@
                 </configuration> 
             </plugin> 
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
-                    <finalName>XpathGenerator</finalName>
-                    <descriptorRefs>
-                        <!--
-                        <descriptorRef>bin</descriptorRef>
-                        -->
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
                     <archive>
                         <manifest>
                             <mainClass>org.warlock.xpathgenerator.XpathGenerator</mainClass>
                         </manifest>
                     </archive>
-                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
